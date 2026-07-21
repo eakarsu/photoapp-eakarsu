@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+require_relative "../lib/photo_workflow"
+
+store = PhotoWorkflow::Store.new(ENV.fetch("PHOTOAPP_DATA_ROOT"))
+service = PhotoWorkflow::Service.new(store, PhotoWorkflow::ProviderPool.from_env)
+identity = { "actor_id" => "worker:#{ENV.fetch("WORKER_ID")}", "role" => "OPERATOR" }
+run_once = ARGV.include?("--once")
+
+loop do
+  begin
+    job = service.process_next(identity)
+    puts(JSON.generate("job_id" => job && job["id"], "status" => job && job["status"])) if run_once
+  rescue PhotoWorkflow::ProviderError => error
+    warn(JSON.generate("error" => error.code, "attempted_providers" => error.attempted_providers))
+    exit(1) if run_once
+  end
+  break if run_once
+  sleep(job ? 0.1 : 1.0)
+end

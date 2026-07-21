@@ -15,3 +15,14 @@
 /log/*
 !/log/.keep
 /tmp
+
+# Supported photo workflow runtime state and local configuration.
+/data/
+/.env
+/.env.*
+!/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store

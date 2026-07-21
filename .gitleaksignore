@@ -1,0 +1,4 @@
+# Removed Rails development/test cookie keys and commented Devise sample from historical commits.
+44807696f245a0b977df728226d2213da02e7961:config/secrets.yml:generic-api-key:14
+44807696f245a0b977df728226d2213da02e7961:config/secrets.yml:generic-api-key:17
+f29d2661cc50e86944574ff2797101fa3442524f:config/initializers/devise.rb:generic-api-key:9

@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+require "open3"
+
+root = File.expand_path("..", __dir__)
+errors = []
+required = %w[
+  Gemfile README.md OPERATIONS.md PROVIDER_CONTRACTS.md SECURITY.md
+  start.sh bin/photo_server bin/photo_worker bin/test
+  lib/photo_workflow.rb lib/photo_workflow/core.rb lib/photo_workflow/provider.rb lib/photo_workflow/server.rb
+]
+required.each { |path| errors << "missing #{path}" unless File.file?(File.join(root, path)) }
+
+gemfile = File.read(File.join(root, "Gemfile"))
+errors << "supported Gemfile must not load Rails" if gemfile.match?(/^\s*gem\s+["']rails["']/)
+lockfile = File.read(File.join(root, "Gemfile.lock"))
+errors << "supported lockfile must have no gem dependencies" if lockfile.match?(/^    \S+ \(/) || lockfile.match?(/^  rails \(/)
+
+legacy_bins = %w[bin/rails bin/rake bin/spring bin/setup bin/bundle Rakefile config.ru config/application.rb config/environment.rb config/boot.rb]
+legacy_bins.each do |path|
+  content = File.read(File.join(root, path))
+  errors << "#{path} is not retired" unless content.lines.first(8).join.include?("exit 78")
+end
+
+secrets = File.read(File.join(root, "config/secrets.yml"))
+errors << "legacy secret values remain" if secrets.match?(/[0-9a-f]{64,}/i)
+start = File.read(File.join(root, "start.sh"))
+errors << "startup contains destructive process control" if start.match?(/\b(kill|killall|pkill)\b/)
+
+tracked_data, status = Open3.capture2("git", "-C", root, "ls-files", "data")
+errors << "runtime data is tracked" unless status.success? && tracked_data.strip.empty?
+
+if errors.empty?
+  puts "photo workflow boundary valid"
+else
+  warn errors.join("\n")
+  exit 1
+end

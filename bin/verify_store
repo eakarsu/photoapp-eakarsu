@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+require_relative "../lib/photo_workflow"
+
+store = PhotoWorkflow::Store.new(ARGV.fetch(0) { ENV.fetch("PHOTOAPP_DATA_ROOT") })
+state = store.snapshot
+store.verify_audit!(state)
+state.fetch("versions").each_value { |version| store.get_object(version.fetch("object_sha256")) }
+puts JSON.generate("assets" => state["assets"].length, "versions" => state["versions"].length, "jobs" => state["jobs"].length, "audits" => state["audit"].length)

@@ -1,3 +1,6 @@
+warn "The Rails 4 environment boundary is retired; use ./start.sh."
+exit 78
+
 # Load the Rails application.
 require File.expand_path('../application', __FILE__)
 

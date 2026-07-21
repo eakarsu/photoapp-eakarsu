@@ -1,0 +1,8 @@
+.git
+.env
+.env.*
+data
+log
+tmp
+public/uploads
+.idea

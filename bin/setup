@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+warn "The Rails 4 setup path is retired; see OPERATIONS.md."
+exit 78
 require 'pathname'
 
 # path to your application root.

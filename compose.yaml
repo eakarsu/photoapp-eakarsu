@@ -1,0 +1,40 @@
+services:
+  web:
+    build: .
+    read_only: true
+    environment:
+      PHOTOAPP_DATA_ROOT: /var/lib/photoapp
+      PHOTOAPP_ALLOWED_ORIGINS: ${PHOTOAPP_ALLOWED_ORIGINS:?required}
+      PHOTOAPP_ALLOW_NON_LOOPBACK: "true"
+      PHOTOAPP_IDENTITIES_JSON: ${PHOTOAPP_IDENTITIES_JSON:?required}
+      PHOTOAPP_PROVIDERS_JSON: ${PHOTOAPP_PROVIDERS_JSON:?required}
+      PRIMARY_MEDIA_TOKEN: ${PRIMARY_MEDIA_TOKEN:?required}
+      SECONDARY_MEDIA_TOKEN: ${SECONDARY_MEDIA_TOKEN:?required}
+    ports:
+      - "127.0.0.1:${PORT:-3000}:3000"
+    volumes:
+      - photoapp-data:/var/lib/photoapp
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+  worker:
+    build: .
+    read_only: true
+    command: ["ruby", "bin/photo_worker"]
+    environment:
+      PHOTOAPP_DATA_ROOT: /var/lib/photoapp
+      WORKER_ID: worker-1
+      PHOTOAPP_PROVIDERS_JSON: ${PHOTOAPP_PROVIDERS_JSON:?required}
+      PRIMARY_MEDIA_TOKEN: ${PRIMARY_MEDIA_TOKEN:?required}
+      SECONDARY_MEDIA_TOKEN: ${SECONDARY_MEDIA_TOKEN:?required}
+    volumes:
+      - photoapp-data:/var/lib/photoapp
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+volumes:
+  photoapp-data:

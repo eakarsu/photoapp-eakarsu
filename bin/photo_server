@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+require_relative "../lib/photo_workflow"
+
+data_root = ENV.fetch("PHOTOAPP_DATA_ROOT")
+allowed_origins = ENV.fetch("PHOTOAPP_ALLOWED_ORIGINS").split(",").map(&:strip).reject(&:empty?)
+raise PhotoWorkflow::Error.new("ORIGINS_NOT_CONFIGURED", "PHOTOAPP_ALLOWED_ORIGINS is required", 503) if allowed_origins.empty?
+
+store = PhotoWorkflow::Store.new(data_root)
+providers = PhotoWorkflow::ProviderPool.from_env
+service = PhotoWorkflow::Service.new(store, providers)
+authenticator = PhotoWorkflow::TokenAuthenticator.from_env
+host = ENV.fetch("HOST", "127.0.0.1")
+port = Integer(ENV.fetch("PORT", "3000"))
+
+PhotoWorkflow::Server.new(service, authenticator, host, port, allowed_origins).run

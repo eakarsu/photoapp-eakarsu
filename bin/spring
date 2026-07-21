@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+warn "The Rails 4 Spring runtime is retired."
+exit 78
 
 # This file loads spring without using Bundler, in order to be fast.
 # It gets overwritten when you run the `spring binstub` command.

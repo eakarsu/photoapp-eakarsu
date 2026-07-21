@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+warn "The Rails 4 reference runtime is retired; use bin/test or bin/validate_boundary."
+exit 78
 begin
   load File.expand_path('../spring', __FILE__)
 rescue LoadError => e
