@@ -3,12 +3,13 @@ GEM
   specs:
 
 PLATFORMS
+  arm64-darwin-24
   arm64-darwin-25
 
 DEPENDENCIES
 
 RUBY VERSION
-   ruby 2.6.10p210
+  ruby 2.6.10p210
 
 BUNDLED WITH
-   2.4.22
+  4.0.16
