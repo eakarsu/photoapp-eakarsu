@@ -22,6 +22,11 @@ const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url||'/',`http://127.0.0.1:${port}`);
   try{
     if(req.method==='GET'&&url.pathname==='/api/health')return json(res,200,{status:'ok',project});
+    if(req.method==='GET'&&url.pathname==='/api/auth/demo-credentials'){
+      if(process.env.NODE_ENV==='production')return json(res,404,{error:'Not found'});
+      const email=process.env.DEMO_EMAIL||process.env.PROVISION_ADMIN_EMAIL||process.env.ADMIN_EMAIL;const password=process.env.DEMO_PASSWORD||process.env.PROVISION_ADMIN_PASSWORD||process.env.ADMIN_PASSWORD;
+      return email&&password?json(res,200,{email,password}):json(res,503,{error:'Demo credentials are not configured'});
+    }
     if(req.method==='POST'&&url.pathname==='/api/auth/login'){
       const body=await readBody(req);const email=String(body.email||'').trim().toLowerCase();const password=String(body.password||'');
       const record=cachedUsers.get(email);if(!record||!verify(password,record.passwordHash))return json(res,401,{error:'Invalid credentials'});
